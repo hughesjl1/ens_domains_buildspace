@@ -4,7 +4,7 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
-contract Domains is ERC721URIStorage {
+contract Domain is ERC721URIStorage {
 
     mapping(string => address) public domains;
 
@@ -32,25 +32,34 @@ contract Domains is ERC721URIStorage {
 
 
 
-    function addDomain(string calldata domain) payable public {
+    function addDomain(string memory domain) payable public {
         require(domains[domain] == address(0), "domain already registered");
 
         uint domain_price = price(domain);
 
         require(msg.value > domain_price, "domain price is higher than the amount of ETH sent");
 
+        string memory pre_svg = "<svg>";
+        string memory post_svg = "</svg";
+
+        string memory combinedSvg = string(abi.encodePacked(pre_svg, domain, post_svg));
+
+        string memory jsonStringify = string(abi.encodePacked('{"name": "',
+            combinedSvg, 
+            '"',
+             '}'
+        ));
+
         /**
         @dev Create a NFT for the token
         */
-
-
 
         _tokenIds.increment();
         uint tokenId = _tokenIds.current();
         domainCount[domain] = tokenId; 
 
         _safeMint(msg.sender, tokenId);
-        _setTokenURI(tokenId, domain);
+        _setTokenURI(tokenId, jsonStringify);
 
 
         domains[domain] = msg.sender;
