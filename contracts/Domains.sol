@@ -14,12 +14,12 @@ contract Domains is ERC721URIStorage {
 
     Counters.Counter private _tokenIds;
     
-    constructor(){
+    constructor() ERC721("DOMAIN_ENS", "ENS"){
         console.log("ens domain contract created");
     }
 
-    function price(string memory _domain) public returns(uint){
-        uint memory _domain_length = bytes(_domain).length;
+    function price(string memory _domain) public pure returns(uint){
+        uint  _domain_length = bytes(_domain).length;
     
         if (_domain_length < 3) {
             return 0.5*10*18;
@@ -32,10 +32,10 @@ contract Domains is ERC721URIStorage {
 
 
 
-    function addDomain(string calldata domain) public {
+    function addDomain(string calldata domain) payable public {
         require(domains[domain] == address(0), "domain already registered");
 
-        uint memory domain_price = price(domain);
+        uint domain_price = price(domain);
 
         require(msg.value > domain_price, "domain price is higher than the amount of ETH sent");
 
@@ -46,7 +46,7 @@ contract Domains is ERC721URIStorage {
 
 
         _tokenIds.increment();
-        uint memory tokenId = _tokenIds.current();
+        uint tokenId = _tokenIds.current();
         domainCount[domain] = tokenId; 
 
         _safeMint(msg.sender, tokenId);
