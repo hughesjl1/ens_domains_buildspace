@@ -3,15 +3,16 @@ const hre = require("hardhat");
 async function main() {
   
   const [signer, otherSigner] = await hre.ethers.getSigners()
-  const domainContractFactory = await hre.ethers.getContractFactory("Domains");
+  const domainContractFactory = await hre.ethers.getContractFactory("Domain");
   const domainContract = await domainContractFactory.deploy();
   await domainContract.deployed();
 
-  const txn = await domainContract.addDomain("corgi");
+  const txn = await domainContract.addDomain("corgi", {value : hre.ethers.utils.parseEther("0.1")});
   await txn.wait();
   const domainOwner = await domainContract.getOwner("corgi");
+  console.log("Owner of the domina corgi", domainOwner);
 
-  console.log("owner domain", domainOwner);
+  console.log("Balance of the domain owner", await hre.ethers.provider.getBalance(domainContract.address));
 
 }
 
